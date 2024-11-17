@@ -1,7 +1,7 @@
 #################### Data Segment ##################
 .data
 base: .asciiz "In what base to print 2-10?"
-array: .word -1, -2, -25, -56, -5, -6, -7, -12, -127, -3
+array: .word 0,2,-25,56,-5,6,-7,12,127,-3
 
 try: .asciiz "HERE"
 msgB: .asciiz "print_array_sign"
@@ -188,8 +188,12 @@ print_base:
     lw $a2, 4($sp) 		#loading number to $a2
     lw $a1, 0($sp) 		#loading base to $a1
     li $t1, 0x0		#initillize reminder counter
-    ble $a2, 0x0, negative_sign	#check if the number is negative
+    li $t0, 0x0		#initillize counter for base 2
+    blt $a2, 0x0, negative_sign	#check if the number is negative
+    beq $a2, 0x0, loop	#check if the number is zero
+    bne $a1, 0x2, not_base_2	#check if the not base 2	
     j loop
+    
     
     # --------- 2's Complement ---------
 negative_sign:
@@ -198,22 +202,28 @@ negative_sign:
     addi $a2, $a2, 1	#add one bit
     li $v0, 11  	
     li $a0, 45  		# "-" in ASCII
-    syscall 		#print -  			
+    syscall 		#print -
+    bne $a1, 0x2, not_base_2	#check if the not base 2	  			
     j loop
 
 negative_unsign:
     addi $a2, $a2, 0xFFFFFFFF 	#change bits 0 -> 1 or 1 -> 0
     addi $a2, $a2, 1	#add one bit
-  			    			    			  			    			    						    			    			  			    			    			
+  		
+not_base_2:
+    beq $a2, 0x0, print_number
+			    			    			  			    			    						    			    			  			    			    				    			    			  			    			    						    			    			  			    			    					    			    			  			    			    						    			    			  			    			    				    			    			  			    			    						    			    			  			    			    			
     # --------- divide number by base ---------
 loop:     
-    beq $a2, 0x0, print_number	#the number is not zero
+    beq $t0, 31, print_number	#loop for 32 bits
     divu $a2, $a1		#divide number in base 
     mflo $a2 		#saving the diveded number
     mfhi $t2		#saving the reminder number
     addiu $sp, $sp, -4	#making room for the new reminder
     sw $t2, 0($sp)		#pushing to stack the new reminder
     addi $t1, $t1, 0x1	#counter ++
+    addi $t0, $t0, 0x1	#counter ++
+    bne $a1, 0x2, not_base_2
     j loop
     
 print_number:
@@ -242,8 +252,6 @@ load:
     lw $ra, 8($sp) 		#Restore function address 
     addiu $sp, $sp,12 	#pop the stack
     jr $ra 		#return from caller
-        
-
     
 ################################# PRINT ARRAY SIGN ###################################
 
