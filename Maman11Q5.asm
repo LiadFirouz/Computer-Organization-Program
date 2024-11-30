@@ -1,3 +1,20 @@
+# Title:        Maman 11 Question 5
+# Filename:     Maman11Q5.asm
+# Author:       Liad Firouz
+# Date:         8.12.24
+# Description:  
+#               This MIPS assembly program performs various operations on an array 
+#               of integers, including printing elements in different bases, 
+#               computing the sum of signed and unsigned elements, and calculating
+#               differences between consecutive elements. 
+# Input:        
+#               - A user-specified base (integer between 2 and 10) for number printing.
+# Output:       
+#               - The array elements printed in the specified base as signed or 
+#                 unsigned integers.
+#               - The sum of array elements printed as signed or unsigned integers.
+#               - Differences between consecutive array elements (signed).
+
 #################### Data Segment ##################
 .data
 base: .asciiz "In what base to print 2-10?"
@@ -10,495 +27,626 @@ msgC2: .asciiz "sum_sign"
 msgD: .asciiz "sum_unsign"
 msgE: .asciiz "print_dif_sign"
 msgF: .asciiz "print_sum_unsign"
+
 #################### Code Segment ##################
 
 .text
 
 main:
 
-############################### A #####################################
+############################### Section A: Input Validation ###############################
  
-    # --------- Print Original Message ---------
-    la $a0, base      # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
+    # --------- Print the Prompt Message ---------
+    la $a0, base              # Load the address of the input message into $a0
+    li $v0, 4                 # System call to print a string
     syscall
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline 
     syscall
 
-    # --------- Read An Input ---------
-    li $v0, 5              
-    syscall	          # Syscall to read a integer
-    blt $v0, 0x2, main        # If lower than 2
-    bgt $v0, 0xA, main        # If upper than 10
-    move $a1, $v0
-    addi $sp, $sp, -4
-    sw $a1, 0($sp)
+    # --------- Read an Integer Input ---------
+    li $v0, 5                 # System call to read an integer
+    syscall                   # Execute system call
+    blt $v0, 0x2, main        # If input is less than 2, go back to main
+    bgt $v0, 0xA, main        # If input is greater than 10, go back to main
+    move $a1, $v0             # Store the valid input in $a1
+    addi $sp, $sp, -4         # Allocate space on the stack
+    sw $a1, 0($sp)            # Save the input onto the stack
 
-############################### B #####################################
-    # --------- Print Original Message ---------
-    la $a0, msgB      # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
-    syscall
-    
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+############################### Section B: Print Array Sign ###############################
+
+    # --------- Print the Prompt Message ---------
+    la $a0, msgB              # Load the address of the message into $a0
+    li $v0, 4                 # System call to print a string
     syscall
     
-    # --------- TRY ---------
-    la $a2, array 	          #array address
-    jal print_array_sign
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
+    syscall
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Call Subroutine to Process Array ---------
+    la $a2, array             # Load the array's base address into $a2
+    jal print_array_sign       # Jump to the 'print_array_sign' subroutine
+    
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
     syscall
 
-
-############################### C #####################################
+############################### Section C: Print Array Unsigned ############################
   
-    # --------- Print Original Message ---------
-    la $a0, msgC      # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
+    # --------- Print the Prompt Message ---------
+    la $a0, msgC              # Load the address of the message into $a0
+    li $v0, 4                 # System call to print a string
     syscall
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
     syscall
     
-    # --------- TRY ---------
-    la $a2, array 	          #array address
-    jal print_array_unsign
+    # --------- Call Subroutine to Process Array ---------
+    la $a2, array             # Load the array's base address into $a2
+    jal print_array_unsign     # Jump to the 'print_array_unsign' subroutine
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
-    syscall
-
-############################### C2 #####################################
-  
-    # --------- Print Original Message ---------
-    la $a0, msgC2      # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
-    syscall
-    
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
-    syscall
-    
-    # --------- TRY ---------
-    la $a2, array 	          #array address
-    jal sum_sign
-    
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
-    syscall
-    
-############################### D #####################################
-  
-    # --------- Print Original Message ---------
-    la $a0, msgD           # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
-    syscall
-    
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
-    syscall
-    
-    # --------- TRY ---------
-    la $a2, array 	          #array address
-    li $a3, 0	          #unsign
-    jal sum_unsign
-    
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
     syscall
 
-############################### E #####################################
+############################### Section C2: Sum Array Signed ##############################
   
-    # --------- Print Original Message ---------
-    la $a0, msgE           # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
+    # --------- Print the Prompt Message ---------
+    la $a0, msgC2             # Load the address of the message into $a0
+    li $v0, 4                 # System call to print a string
     syscall
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
     syscall
     
-    # --------- TRY ---------
-    la $a2, array 	          #array address
-    li $a3, 1	          #unsign
-    jal print_dif_sign
+    # --------- Call Subroutine to Calculate Sum ---------
+    la $a2, array             # Load the array's base address into $a2
+    jal sum_sign               # Jump to the 'sum_sign' subroutine
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
     syscall
 
-############################### F #####################################
+############################### Section D: Sum Array Unsigned #############################
   
-    # --------- Print Original Message ---------
-    la $a0, msgF           # Load address of input message to $a0
-    li $v0, 4              # Syscall to print the string
+    # --------- Print the Prompt Message ---------
+    la $a0, msgD              # Load the address of the message into $a0
+    li $v0, 4                 # System call to print a string
     syscall
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
     syscall
     
-    # --------- TRY ---------
-    la $a2, array 	          #array address
-    li $a3, 0	          #unsign
-    jal print_sum_unsign
+    # --------- Call Subroutine to Calculate Sum ---------
+    la $a2, array             # Load the array's base address into $a2
+    li $a3, 0                 # Specify unsigned operation mode
+    jal sum_unsign             # Jump to the 'sum_unsign' subroutine
     
-    # --------- Print New Line ---------
-    li $v0, 11             # Syscall to print a single character
-    li $a0, 10             # ASCII code for newline 
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
+    syscall
+
+############################### Section E: Print Differences #############################
+  
+    # --------- Print the Prompt Message ---------
+    la $a0, msgE              # Load the address of the message into $a0
+    li $v0, 4                 # System call to print a string
     syscall
     
-#######################################################################    
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
+    syscall
+    
+    # --------- Call Subroutine to Print Differences ---------
+    la $a2, array             # Load the array's base address into $a2
+    li $a3, 1                 # Specify signed operation mode
+    jal print_dif_sign         # Jump to the 'print_dif_sign' subroutine
+    
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
+    syscall
+
+############################### Section F: Print Sum Unsigned ############################
+  
+    # --------- Print the Prompt Message ---------
+    la $a0, msgF              # Load the address of the message into $a0
+    li $v0, 4                 # System call to print a string
+    syscall
+    
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
+    syscall
+    
+    # --------- Call Subroutine to Print Sum ---------
+    la $a2, array             # Load the array's base address into $a2
+    li $a3, 0                 # Specify unsigned operation mode
+    jal print_sum_unsign       # Jump to the 'print_sum_unsign' subroutine
+    
+    # --------- Print a New Line ---------
+    li $v0, 11                # System call to print a single character
+    li $a0, 10                # ASCII code for a newline
+    syscall
+    
+############################### Exit Program ##############################################
 
 exitProgram:    
-    li $v0, 10              # System call to terminate
-    syscall                 # the program
-
+    li $v0, 10                # System call to terminate the program
+    syscall                   # Execute system call
 
 ################################# PRINT BASE ###################################
- 
+# Function: print_base
+# Purpose: Print a number (`$a2`) in a specified base (`$a1`) with support for signed/unsigned representation (`$a3`).
+# Registers:
+#   $a1 - Base (e.g., 2, 10)
+#   $a2 - Number to convert and print
+#   $a3 - Sign indicator (1 = signed, 0 = unsigned)
+# Stack Usage:
+#   - Save $ra, $a3, $a2, and $a1 for function integrity.
+#   - Push remainders for reverse printing of digits.
+
 print_base: 
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -16 	#making room for 4 items
-    sw $ra, 12($sp) 	#Save return address 
-    sw $a3, 8($sp) 		#Save sign in stack
-    sw $a2, 4($sp) 		#Save number in stack
-    sw $a1, 0($sp) 		#Save base in stack
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -16        # Make room for 4 items on the stack
+    sw $ra, 12($sp)            # Save return address
+    sw $a3, 8($sp)             # Save sign flag
+    sw $a2, 4($sp)             # Save number
+    sw $a1, 0($sp)             # Save base
+
+    # --------- Restore arguments ---------
+    lw $a3, 8($sp)             # Load sign flag
+    lw $a2, 4($sp)             # Load number
+    lw $a1, 0($sp)             # Load base
+    li $t1, 0x0                # Initialize reminder counter
+    li $t0, 0x0                # Initialize loop counter
+    blt $a2, 0x0, negative_sign # If the number is negative, handle sign
+    beq $a2, 0x0, loop          # If the number is 0, go to main loop
+    bne $a1, 0x2, not_base_2    # If not base 2, skip to general case
+    j loop                      # Jump to main loop
     
-    # --------- loading arguments ---------
-    lw $a3, 8($sp) 		#loading sign to $a3
-    lw $a2, 4($sp) 		#loading number to $a2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t1, 0x0		#initillize reminder counter
-    li $t0, 0x0		#initillize counter for base 2
-    blt $a2, 0x0, negative_sign	#check if the number is negative
-    beq $a2, 0x0, loop	#check if the number is zero
-    bne $a1, 0x2, not_base_2	#check if the not base 2	
-    j loop
-    
-    
-    # --------- 2's Complement ---------
+# --------- Handle negative numbers (two's complement) ---------
 negative_sign:
-    beq $a3, 0, negative_unsign	#a3 == 0
-    xori $a2, $a2, 0xFFFFFFFF 	#change bits 0 -> 1 or 1 -> 0
-    addi $a2, $a2, 1	#add one bit
-    li $v0, 11  	
-    li $a0, 45  		# "-" in ASCII
-    syscall 		#print -
-    bne $a1, 0x2, not_base_2	#check if the not base 2	  			
-    j loop
+    beq $a3, 0, negative_unsign # If unsigned, handle without printing '-'
+    xori $a2, $a2, 0xFFFFFFFF   # Flip bits (1's complement)
+    addi $a2, $a2, 1            # Add 1 (2's complement)
+    li $v0, 11                  # Syscall to print character
+    li $a0, 45                  # ASCII for '-'
+    syscall                     # Print '-'
+    bne $a1, 0x2, not_base_2    # If not base 2, skip to general case
+    j loop                      # Jump to main loop
 
 negative_unsign:
-    addi $a2, $a2, 0xFFFFFFFF 	#change bits 0 -> 1 or 1 -> 0
-    addi $a2, $a2, 1	#add one bit
-  		
+    addi $a2, $a2, 0xFFFFFFFF   # Flip bits (1's complement)
+    addi $a2, $a2, 1            # Add 1 (2's complement)
+    # Fall through to `not_base_2`
+
+# --------- General case for non-binary bases ---------
 not_base_2:
-    beq $a2, 0x0, print_number
-			    			    			  			    			    						    			    			  			    			    				    			    			  			    			    						    			    			  			    			    					    			    			  			    			    						    			    			  			    			    				    			    			  			    			    						    			    			  			    			    			
-    # --------- divide number by base ---------
-loop:     
-    beq $t0, 31, print_number	#loop for 32 bits
-    divu $a2, $a1		#divide number in base 
-    mflo $a2 		#saving the diveded number
-    mfhi $t2		#saving the reminder number
-    addiu $sp, $sp, -4	#making room for the new reminder
-    sw $t2, 0($sp)		#pushing to stack the new reminder
-    addi $t1, $t1, 0x1	#counter ++
-    addi $t0, $t0, 0x1	#counter ++
-    bne $a1, 0x2, not_base_2
-    j loop
-    
+    beq $a2, 0x0, print_number  # If number is 0, print it
+    # Fall through to the main loop
+
+# --------- Main loop: Divide number by base ---------
+loop:
+    beq $t0, 31, print_number   # Exit if all 32 bits are processed
+    divu $a2, $a1               # Divide number by base
+    mflo $a2                    # Save quotient (number / base)
+    mfhi $t2                    # Save remainder (number % base)
+    addiu $sp, $sp, -4          # Make room on the stack for the remainder
+    sw $t2, 0($sp)              # Push remainder to stack
+    addi $t1, $t1, 1            # Increment remainder counter
+    addi $t0, $t0, 1            # Increment loop counter
+    bne $a1, 0x2, not_base_2    # If not base 2, repeat general case
+    j loop                      # Continue loop
+
+# --------- Print digits from stack ---------
 print_number:
-    beq $t1, 0x0, return_to_caller	#if counter is not zero
-    lw $a0, 0($sp)		#load the top reminder
-    li $v0, 1		
-    sub $t1, $t1, 1		#decrease counter
-    syscall		#print integer
-    addiu $sp, $sp, 4	#pop the top number
-    j print_number
-    
-    # --------- return to the caller ---------
+    beq $t1, 0x0, return_to_caller # If no more digits, return
+    lw $a0, 0($sp)                # Load the topmost digit
+    li $v0, 1                     # Syscall to print integer
+    sub $t1, $t1, 1               # Decrement digit counter
+    syscall                       # Print the digit
+    addiu $sp, $sp, 4             # Pop the top number from the stack
+    j print_number                # Continue printing digits
+
+# --------- Restore caller state and return ---------
 return_to_caller:
-    lw $a1, 0($sp) 		#Restore base
-    lw $a2, 4($sp) 		#Restore number
-    lw $a3, 8($sp) 		#Restore sign 
-    lw $ra, 12($sp) 	#Restore function address 
-    addiu $sp, $sp,16 	#pop the stack
-    jr $ra 		#return from caller
-    
-################################# STORE & LOAD ###################################
-    # --------- return to the caller ---------
+    lw $a1, 0($sp)                # Restore base
+    lw $a2, 4($sp)                # Restore number
+    lw $a3, 8($sp)                # Restore sign flag
+    lw $ra, 12($sp)               # Restore return address
+    addiu $sp, $sp, 16            # Adjust stack pointer to original state
+    jr $ra                        # Return to caller
+
+################################# LOAD ###################################
+# Function: load
+# Purpose:
+#   Restore saved registers (base, number, return address) from the stack
+#   and return control to the calling function.
+# Stack Usage:
+#   - The function assumes that `$a1` (base), `$a2` (number), and `$ra`
+#     (return address) were saved in this order on the stack.
+#   - Frees the stack space used for these values upon returning.
+#
+# Registers:
+#   $a1 - Base to restore
+#   $a2 - Number to restore
+#   $ra - Return address to restore
+#   $sp - Stack pointer for managing the stack
+
 load:
-    lw $a1, 0($sp) 		#Restore base
-    lw $a2, 4($sp) 		#Restore number
-    lw $ra, 8($sp) 		#Restore function address 
-    addiu $sp, $sp,12 	#pop the stack
-    jr $ra 		#return from caller
-    
+    lw $a1, 0($sp)        # Restore base from the stack
+    lw $a2, 4($sp)        # Restore number from the stack
+    lw $ra, 8($sp)        # Restore return address from the stack
+    addiu $sp, $sp, 12    # Adjust stack pointer (pop 3 words: 12 bytes)
+    jr $ra                # Return to the caller
+
 ################################# PRINT ARRAY SIGN ###################################
+# Function: print_array_sign
+# Purpose:
+#   Iterates through an array of integers, prints each integer in a specified base,
+#   and handles signed numbers. Adds a space after each number.
+#
+# Registers:
+#   $a1 - Base for printing
+#   $a2 - Current integer from the array
+#   $t2 - Address of the array (iterator)
+#   $t3 - Current index in the array
+#   $t1 - Array length (constant 10 in this case)
+#
+# Stack Usage:
+#   - Saves the return address, array base address, and loop variables.
+#   - Handles temporary values when calling `print_base`.
 
 print_array_sign:
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -12 	#making room for 4 items
-    sw $ra, 8($sp) 		#Save return address 
-    sw $a2, 4($sp) 		#Save number in stack
-    sw $a1, 0($sp) 		#Save base in stack
-    
-    # --------- initillize variables ---------
-    lw $t2, 4($sp) 		#loading array address to $t2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t3, 0		#initillize array index $t3=0
-    li $t1, 10		#initillize array length $t4=10
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -12        # Make room for 3 items on the stack
+    sw $ra, 8($sp)             # Save return address
+    sw $a2, 4($sp)             # Save array base address
+    sw $a1, 0($sp)             # Save base for printing
 
+    # --------- Initialize variables ---------
+    lw $t2, 4($sp)             # Load array address into $t2
+    lw $a1, 0($sp)             # Load base into $a1
+    li $t3, 0                  # Initialize array index $t3 = 0
+    li $t1, 10                 # Initialize array length $t1 = 10
+
+# --------- Loop through array ---------
 pas_loop:
-    beq $t3, $t1, pas_end	#loop untill $t3=10
-    lw $a2, 0($t2)		#initillize a2=t2[i]
-    addiu $sp, $sp, -12	#makking room for the current index 
-    sw $t2, 0($sp)		#saving array index
-    sw $t1, 4($sp)		#saving the loop index
-    li $a3, 1
-    sw $a3, 8($sp)
-    
-    jal print_base
-    
-    lw $a3, 8($sp)
-    lw $t1, 4($sp)		#restore loop index into $t1
-    lw $t2, 0($sp)		#restore array index into $t2
-    addiu $sp, $sp, 12	#poping the value
-    addi $t3, $t3, 1	#increasing loop index
-    addi $t2, $t2, 4	#increasing array index
-    
-    la $a0, 0x20		#loading space in ASCII
-    li $v0, 11
-    syscall		#making space
-    
-    j pas_loop
-    
+    beq $t3, $t1, pas_end      # Exit loop if $t3 == $t1 (end of array)
+    lw $a2, 0($t2)             # Load current array element into $a2
+    addiu $sp, $sp, -12        # Make room on stack for temporary values
+    sw $t2, 0($sp)             # Save array address (iterator)
+    sw $t1, 4($sp)             # Save array length
+    li $a3, 1                  # Set sign flag ($a3 = 1 for signed)
+    sw $a3, 8($sp)             # Save sign flag
+
+    jal print_base             # Call `print_base` to print the current element
+
+    # --------- Restore state after `print_base` ---------
+    lw $a3, 8($sp)             # Restore sign flag
+    lw $t1, 4($sp)             # Restore array length
+    lw $t2, 0($sp)             # Restore array address (iterator)
+    addiu $sp, $sp, 12         # Restore stack pointer
+    addi $t3, $t3, 1           # Increment array index
+    addi $t2, $t2, 4           # Move to the next array element (word = 4 bytes)
+
+    # --------- Print space ---------
+    la $a0, 0x20               # Load ASCII value for space (' ')
+    li $v0, 11                 # Syscall for printing a character
+    syscall                    # Print space
+
+    j pas_loop                 # Repeat loop for next array element
+
+# --------- End of loop ---------
 pas_end:
-    j load
+    jal load                   # Call `load` to restore caller state and return
+
 
 ################################# PRINT ARRAY UNSIGN ###################################
+# Function: print_array_unsign
+# Purpose:
+#   Iterates through an array of unsigned integers, prints each integer in a specified base,
+#   and adds a space after each number.
+#
+# Registers:
+#   $a1 - Base for printing
+#   $a2 - Current integer from the array
+#   $t2 - Address of the array (iterator)
+#   $t3 - Current index in the array
+#   $t1 - Array length (constant 10 in this case)
+#
+# Stack Usage:
+#   - Saves the return address, array base address, and loop variables.
+#   - Handles temporary values when calling `print_base`.
 
 print_array_unsign:
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -12 	#making room for 4 items
-    sw $ra, 8($sp) 		#Save return address 
-    sw $a2, 4($sp) 		#Save number in stack
-    sw $a1, 0($sp) 		#Save base in stack
-    
-    # --------- initillize variables ---------
-    lw $t2, 4($sp) 		#loading array address to $t2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t3, 0		#initillize array index $t3=0
-    li $t1, 10		#initillize array length $t4=10
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -12        # Make room for 3 items on the stack
+    sw $ra, 8($sp)             # Save return address
+    sw $a2, 4($sp)             # Save array base address
+    sw $a1, 0($sp)             # Save base for printing
 
+    # --------- Initialize variables ---------
+    lw $t2, 4($sp)             # Load array address into $t2
+    lw $a1, 0($sp)             # Load base into $a1
+    li $t3, 0                  # Initialize array index $t3 = 0
+    li $t1, 10                 # Initialize array length $t1 = 10
+
+# --------- Loop through array ---------
 pau_loop:
-    beq $t3, $t1, pau_end	#loop untill $t3=10
-    lw $a2, 0($t2)		#initillize a2=t2[i]
-    addiu $sp, $sp, -12	#makking room for the current index 
-    sw $t2, 0($sp)		#saving array index
-    sw $t1, 4($sp)		#saving the loop index
-    li $a3, 0
-    sw $a3, 8($sp)
-    
-    jal print_base
-    
-    lw $a3, 8($sp)
-    lw $t1, 4($sp)		#restore loop index into $t1
-    lw $t2, 0($sp)		#restore array index into $t2
-    addiu $sp, $sp, 12	#poping the value
-    addi $t3, $t3, 1	#increasing loop index
-    addi $t2, $t2, 4	#increasing array index
-    
-    la $a0, 0x20		#loading space in ASCII
-    li $v0, 11
-    syscall		#making space
-    
-    j pau_loop
-    
+    beq $t3, $t1, pau_end      # Exit loop if $t3 == $t1 (end of array)
+    lw $a2, 0($t2)             # Load current array element into $a2
+    addiu $sp, $sp, -12        # Make room on stack for temporary values
+    sw $t2, 0($sp)             # Save array address (iterator)
+    sw $t1, 4($sp)             # Save array length
+    li $a3, 0                  # Set sign flag ($a3 = 0 for unsigned)
+    sw $a3, 8($sp)             # Save sign flag
+
+    jal print_base             # Call `print_base` to print the current element
+
+    # --------- Restore state after `print_base` ---------
+    lw $a3, 8($sp)             # Restore sign flag
+    lw $t1, 4($sp)             # Restore array length
+    lw $t2, 0($sp)             # Restore array address (iterator)
+    addiu $sp, $sp, 12         # Restore stack pointer
+    addi $t3, $t3, 1           # Increment array index
+    addi $t2, $t2, 4           # Move to the next array element (word = 4 bytes)
+
+    # --------- Print space ---------
+    la $a0, 0x20               # Load ASCII value for space (' ')
+    li $v0, 11                 # Syscall for printing a character
+    syscall                    # Print space
+
+    j pau_loop                 # Repeat loop for next array element
+
+# --------- End of loop ---------
 pau_end:
-    j load
+    jal load                   # Call `load` to restore caller state and return
 
 ################################# SUM SIGN ###################################
+# Function: sum_sign
+# Purpose:
+#   Computes the sum of all signed integers in an array, then prints the sum
+#   in the specified base using the `print_base` function.
+#
+# Registers:
+#   $a1 - Base for printing
+#   $a2 - Current integer from the array (used temporarily for summation)
+#   $a3 - Running sum of the array elements
+#   $t2 - Address of the array (iterator)
+#   $t3 - Current index in the array
+#   $t1 - Array length (constant 10 in this case)
+#
+# Stack Usage:
+#   - Saves the return address, base, and array address.
+#   - Temporarily handles loop state when necessary.
 
 sum_sign:
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -12 	#making room for 4 items
-    sw $ra, 8($sp) 		#Save return address 
-    sw $a2, 4($sp) 		#Save array address in stack
-    sw $a1, 0($sp) 		#Save base in stack
-    
-    # --------- initillize variables ---------
-    lw $t2, 4($sp) 		#loading array address to $t2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t3, 0		#initillize array index $t3=0
-    li $t1, 10		#initillize array length $t4=10
-    li $a3, 0		#initillize array index $a2=0
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -12        # Make room for 3 items on the stack
+    sw $ra, 8($sp)             # Save return address
+    sw $a2, 4($sp)             # Save array address
+    sw $a1, 0($sp)             # Save base
 
+    # --------- Initialize variables ---------
+    lw $t2, 4($sp)             # Load array address into $t2
+    lw $a1, 0($sp)             # Load base into $a1
+    li $t3, 0                  # Initialize array index $t3 = 0
+    li $t1, 10                 # Set array length $t1 = 10
+    li $a3, 0                  # Initialize running sum $a3 = 0
+
+# --------- Loop through array ---------
 ss_loop:
-    beq $t3, $t1, ss_end	#loop untill $t3=10
-    lw $a2, 0($t2)		#initillize a2=t2[i]
-    add $a3, $a3, $a2
-    addiu $sp, $sp, -8	#makking room for the current index 
-    sw $t2, 0($sp)		#saving array index
-    sw $t1, 4($sp)		#saving the loop index
+    beq $t3, $t1, ss_end       # Exit loop if $t3 == $t1 (end of array)
+    lw $a2, 0($t2)             # Load current array element into $a2
+    add $a3, $a3, $a2          # Add current element to the running sum
+    addi $t3, $t3, 1           # Increment array index
+    addi $t2, $t2, 4           # Move to the next array element (word = 4 bytes)
+    j ss_loop                  # Repeat loop for next array element
 
-
-    lw $t1, 4($sp)		#restore loop index into $t1
-    lw $t2, 0($sp)		#restore array index into $t2
-    addiu $sp, $sp, 8	#poping the value
-    addi $t3, $t3, 1	#increasing loop index
-    addi $t2, $t2, 4	#increasing array index
-
-    j ss_loop
-        
-
+# --------- End of loop ---------
 ss_end:
-    move $a2, $a3
-    li $a3, 1
-    jal print_base
-    j load
-    
+    move $a2, $a3              # Move the sum into $a2 for printing
+    li $a3, 1                  # Set sign flag ($a3 = 1 for signed)
+    jal print_base             # Print the sum using `print_base`
+    jal load                   # Restore caller state and return
     
 ################################# SUM UNSIGN ###################################
+# Function: sum_unsign
+# Purpose:
+#   Computes the sum of all unsigned integers in an array, then prints the sum
+#   in the specified base using the `print_base` function.
+#
+# Registers:
+#   $a1 - Base for printing
+#   $a2 - Current integer from the array (used temporarily for summation)
+#   $a3 - Running sum of the array elements
+#   $t2 - Address of the array (iterator)
+#   $t3 - Current index in the array
+#   $t1 - Array length (constant 10 in this case)
+#
+# Stack Usage:
+#   - Saves the return address, base, and array address.
+#   - Temporarily handles loop state when necessary.
 
 sum_unsign:
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -12 	#making room for 4 items
-    sw $ra, 8($sp) 	                    #Save return address 
-    sw $a2, 4($sp) 		#Save number in stack
-    sw $a1, 0($sp) 		#Save base in stack
-    
-    # --------- initillize variables ---------
-    lw $t2, 4($sp) 		#loading array address to $t2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t3, 0		#initillize array index $t3=0
-    li $t1, 10		#initillize array length $t4=10
-    li $a3, 0		#initillize array index $a2=0
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -12        # Make room for 3 items on the stack
+    sw $ra, 8($sp)             # Save return address
+    sw $a2, 4($sp)             # Save array address
+    sw $a1, 0($sp)             # Save base
 
+    # --------- Initialize variables ---------
+    lw $t2, 4($sp)             # Load array address into $t2
+    lw $a1, 0($sp)             # Load base into $a1
+    li $t3, 0                  # Initialize array index $t3 = 0
+    li $t1, 10                 # Set array length $t1 = 10
+    li $a3, 0                  # Initialize running sum $a3 = 0
+
+# --------- Loop through array ---------
 su_loop:
-    beq $t3, $t1, su_end	#loop untill $t3=10
-    lw $a2, 0($t2)		#initillize a2=t2[i]
-    addu $a3, $a3, $a2	#a3+=a2 as unsign numbers
-    addiu $sp, $sp, -8	#makking room for the current index 
-    sw $t2, 0($sp)		#saving array index
-    sw $t1, 4($sp)		#saving the loop index
+    beq $t3, $t1, su_end       # Exit loop if $t3 == $t1 (end of array)
+    lw $a2, 0($t2)             # Load current array element into $a2
+    addu $a3, $a3, $a2         # Add current element to the running sum (unsigned)
+    addi $t3, $t3, 1           # Increment array index
+    addi $t2, $t2, 4           # Move to the next array element (word = 4 bytes)
+    j su_loop                  # Repeat loop for next array element
 
-
-    lw $t1, 4($sp)		#restore loop index into $t1
-    lw $t2, 0($sp)		#restore array index into $t2
-    addiu $sp, $sp, 8	#poping the value
-    addi $t3, $t3, 1	#increasing loop index
-    addi $t2, $t2, 4	#increasing array index
-
-    j su_loop
-
+# --------- End of loop ---------
 su_end:
-    move $a2, $a3
-    li $a3, 0
-    jal print_base
-    j load
+    move $a2, $a3              # Move the sum into $a2 for printing
+    li $a3, 0                  # Set sign flag ($a3 = 0 for unsigned)
+    jal print_base             # Print the sum using `print_base`
+    jal load                   # Restore caller state and return
 
 ################################# PRINT DIF SIGN ###################################
+# Function: print_dif_sign
+# Purpose:
+#   Computes the difference between consecutive signed integers in an array
+#   and prints each difference in the specified base using the `print_base` function.
+#
+# Registers:
+#   $a1 - Base for printing
+#   $a2 - Current difference between consecutive integers
+#   $a3 - Sign flag (1 for signed numbers)
+#   $a0 - Next array element (used for difference calculation)
+#   $t2 - Address of the current array element
+#   $t3 - Current index in the array
+#   $t1 - Array length (set to 9 for differences in a 10-element array)
+#
+# Stack Usage:
+#   - Saves the return address, base, and array address.
+#   - Temporarily handles loop state when necessary.
 
 print_dif_sign:
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -12 	#making room for 4 items
-    sw $ra, 8($sp) 		#Save return address 
-    sw $a2, 4($sp) 		#Save array address in stack
-    sw $a1, 0($sp) 		#Save base in stack
-    
-    # --------- initillize variables ---------
-    lw $t2, 4($sp) 		#loading array address to $t2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t3, 0		#initillize array index $t3=0
-    li $t1, 9		#initillize array length $t4=8
-    li $a3, 1		#initillize dif $a3=0
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -12        # Make room for 3 items on the stack
+    sw $ra, 8($sp)             # Save return address
+    sw $a2, 4($sp)             # Save array address
+    sw $a1, 0($sp)             # Save base
 
+    # --------- Initialize variables ---------
+    lw $t2, 4($sp)             # Load array address into $t2
+    lw $a1, 0($sp)             # Load base into $a1
+    li $t3, 0                  # Initialize array index $t3 = 0
+    li $t1, 9                  # Set loop limit to 9 (10 elements - 1 differences)
+    li $a3, 1                  # Set sign flag ($a3 = 1 for signed differences)
+
+# --------- Loop through array ---------
 pds_loop:
-    beq $t3, $t1, pds_end	#loop untill $t3=10
-    lw $a2, 0($t2)		#initillize a2=t2[i]
-    lw $a0, 4($t2)
-    sub $a2, $a2, $a0	#a2-=t2[i] as unsign numbers
-    addiu $sp, $sp, -8	#makking room for the current index 
-    sw $t2, 0($sp)		#saving array index
-    sw $t1, 4($sp)		#saving the loop index
+    beq $t3, $t1, pds_end      # Exit loop if $t3 == $t1 (processed all differences)
+    lw $a2, 0($t2)             # Load current element into $a2
+    lw $a0, 4($t2)             # Load next element into $a0
+    sub $a2, $a2, $a0          # Compute difference: $a2 = $a2 - $a0
 
-    li $a3, 1
-    jal print_base
-    
-    la $a0, 0x20		#loading space in ASCII
-    li $v0, 11
-    syscall		#making space
+    # --------- Save loop state ---------
+    addiu $sp, $sp, -8         # Make room for loop state
+    sw $t2, 0($sp)             # Save current array pointer
+    sw $t1, 4($sp)             # Save loop limit
 
-    lw $t1, 4($sp)		#restore loop index into $t1
-    lw $t2, 0($sp)		#restore array index into $t2
-    addiu $sp, $sp, 8	#poping the value
-    addi $t3, $t3, 1	#increasing loop index
-    addi $t2, $t2, 4	#increasing array index
-    
-    j pds_loop
-    
+    # --------- Print the difference ---------
+    li $a3, 1                  # Ensure the sign flag is set
+    jal print_base             # Call print_base to print the difference
+
+    # --------- Print a space ---------
+    la $a0, 0x20               # Load ASCII value for space (' ')
+    li $v0, 11                 # Print character syscall
+    syscall
+
+    # --------- Restore loop state ---------
+    lw $t1, 4($sp)             # Restore loop limit
+    lw $t2, 0($sp)             # Restore current array pointer
+    addiu $sp, $sp, 8          # Pop loop state from the stack
+
+    # --------- Advance to the next pair ---------
+    addi $t3, $t3, 1           # Increment array index
+    addi $t2, $t2, 4           # Move to the next array element
+    j pds_loop                 # Repeat loop for the next difference
+
+# --------- End of loop ---------
 pds_end:
-    j load
+    jal load                   # Restore caller state and return
 
 ################################# PRINT SUM UNSIGN ###################################
+# Function: print_sum_unsign
+# Purpose:
+#   Computes the sum of consecutive unsigned integers in an array
+#   and prints each sum in the specified base using the `print_base` function.
+#
+# Registers:
+#   $a1 - Base for printing
+#   $a2 - Current sum of consecutive integers
+#   $a3 - Sign flag (0 for unsigned numbers)
+#   $a0 - Next array element (used for sum calculation)
+#   $t2 - Address of the current array element
+#   $t3 - Current index in the array
+#   $t1 - Array length (set to 9 for sums in a 10-element array)
+#
+# Stack Usage:
+#   - Saves the return address, base, and array address.
+#   - Temporarily handles loop state when necessary.
 
 print_sum_unsign:
-    # --------- saving arguments on to the stack ---------
-    addiu $sp, $sp, -12 	#making room for 4 items
-    sw $ra, 8($sp) 		#Save return address 
-    sw $a2, 4($sp) 		#Save array address in stack
-    sw $a1, 0($sp) 		#Save base in stack
-    
-    # --------- initillize variables ---------
-    lw $t2, 4($sp) 		#loading array address to $t2
-    lw $a1, 0($sp) 		#loading base to $a1
-    li $t3, 0		#initillize array index $t3=0
-    li $t1, 9		#initillize array length $t4=8
-    li $a3, 0		#initillize dif $a3=0
+    # --------- Save caller state ---------
+    addiu $sp, $sp, -12        # Make room for 3 items on the stack
+    sw $ra, 8($sp)             # Save return address
+    sw $a2, 4($sp)             # Save array address
+    sw $a1, 0($sp)             # Save base
 
+    # --------- Initialize variables ---------
+    lw $t2, 4($sp)             # Load array address into $t2
+    lw $a1, 0($sp)             # Load base into $a1
+    li $t3, 0                  # Initialize array index $t3 = 0
+    li $t1, 9                  # Set loop limit to 9 (10 elements - 1 sums)
+    li $a3, 0                  # Set unsigned flag ($a3 = 0 for unsigned sums)
+
+# --------- Loop through array ---------
 psu_loop:
-    beq $t3, $t1, psu_end	#loop untill $t3=10
-    lw $a2, 0($t2)		#initillize a2=t2[i]
-    lw $a0, 4($t2)
-    addu $a2, $a2, $a0	#a2-=t2[i] as unsign numbers
-    addiu $sp, $sp, -8	#makking room for the current index 
-    sw $t2, 0($sp)		#saving array index
-    sw $t1, 4($sp)		#saving the loop index
+    beq $t3, $t1, psu_end      # Exit loop if $t3 == $t1 (processed all sums)
+    lw $a2, 0($t2)             # Load current element into $a2
+    lw $a0, 4($t2)             # Load next element into $a0
+    addu $a2, $a2, $a0         # Compute unsigned sum: $a2 = $a2 + $a0
 
-    li $a3, 0
-    jal print_base
-    
-    la $a0, 0x20		#loading space in ASCII
-    li $v0, 11
-    syscall		#making space
+    # --------- Save loop state ---------
+    addiu $sp, $sp, -8         # Make room for loop state
+    sw $t2, 0($sp)             # Save current array pointer
+    sw $t1, 4($sp)             # Save loop limit
 
-    lw $t1, 4($sp)		#restore loop index into $t1
-    lw $t2, 0($sp)		#restore array index into $t2
-    addiu $sp, $sp, 8	#poping the value
-    addi $t3, $t3, 1	#increasing loop index
-    addi $t2, $t2, 4	#increasing array index
-    
-    j psu_loop
-    
+    # --------- Print the sum ---------
+    li $a3, 0                  # Ensure the unsigned flag is set
+    jal print_base             # Call print_base to print the sum
+
+    # --------- Print a space ---------
+    la $a0, 0x20               # Load ASCII value for space (' ')
+    li $v0, 11                 # Print character syscall
+    syscall
+
+    # --------- Restore loop state ---------
+    lw $t1, 4($sp)             # Restore loop limit
+    lw $t2, 0($sp)             # Restore current array pointer
+    addiu $sp, $sp, 8          # Pop loop state from the stack
+
+    # --------- Advance to the next pair ---------
+    addi $t3, $t3, 1           # Increment array index
+    addi $t2, $t2, 4           # Move to the next array element
+    j psu_loop                 # Repeat loop for the next sum
+
+# --------- End of loop ---------
 psu_end:
-    j load
+    jal load                   # Restore caller state and return
